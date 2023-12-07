@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: my-web-app-deployment
 spec:
-  replicas: 3 
+  replicas: 3
   selector:
     matchLabels:
       app: my-web-app
@@ -14,10 +14,10 @@ spec:
         app: my-web-app
     spec:
       containers:
-        - name: my-web-app
-          image: athuls121/web_app
-          ports:
-            - containerPort: 8080
+      - name: my-web-app
+        image: athuls121/web_app:latest
+        ports:
+        - containerPort: 80
 
 ---
 
@@ -29,7 +29,7 @@ spec:
   selector:
     app: my-web-app
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+  - protocol: TCP
+    port: 80
+    targetPort: 80
   type: LoadBalancer

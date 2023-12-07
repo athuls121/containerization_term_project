@@ -12,9 +12,8 @@ import pickle
 app = Flask(__name__)
 
 # Connect to Redis
-#redis_host = 'my_redis_db'
-#redis_host = 'my-redis-service'
-redis_host = '34.28.149.88'
+#redis_host = '10.26.128.158'
+redis_host = 'my-redis-service'
 redis_port = 6379
 redis_db = 0
 redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db)
@@ -82,4 +81,5 @@ def app_func():
 app.add_url_rule('/', 'webio_view', webio_view(app_func), methods=['GET', 'POST'])
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    #app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=False, port=80)
