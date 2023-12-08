@@ -1,8 +1,8 @@
 from flask import Flask
 from pywebio.platform.flask import webio_view
 from pywebio import STATIC_PATH
-from pywebio.input import *
-from pywebio.output import *
+from pywebio.input import file_upload
+from pywebio.output import put_markdown, put_table, put_image
 from PIL import Image
 import os
 import redis
@@ -11,8 +11,7 @@ import pickle
 
 app = Flask(__name__)
 
-# Connect to Redis
-#redis_host = '10.26.128.158'
+## Connect to Redis
 redis_host = 'my-redis-service'
 redis_port = 6379
 redis_db = 0
@@ -23,13 +22,6 @@ def save_image_metadata(image_key, metadata):
     metadata_pickled = pickle.dumps(metadata)
     redis_client.set(image_key, metadata_pickled)
 
-def get_image_metadata(image_key):
-    # Retrieve metadata from Redis
-    metadata_pickled = redis_client.get(image_key)
-    if metadata_pickled:
-        return pickle.loads(metadata_pickled)
-    return None
-
 def image_metadata(file_path):
     image = Image.open(file_path)
     metadata = {
@@ -37,18 +29,18 @@ def image_metadata(file_path):
         'Format': image.format,
         'Mode': image.mode,
         'Size': f'{image.width} x {image.height}',
-        'DPI (dots per inch)': image.info.get('dpi'),
-        'Bits per channel': image.info.get('bits'),
-        'Color space': image.info.get('icc_profile'),
-        'Orientation': image.info.get('exif'),
-        'Camera Make': image.info.get('make'),
-        'Camera Model': image.info.get('model'),
-        'Software': image.info.get('software'),
-        'Date Taken': image.info.get('datetime'),
-        'Exposure Time': image.info.get('exposuretime'),
-        'Focal Length': image.info.get('focallength'),
-        'Aperture': image.info.get('aperture'),
-        'ISO': image.info.get('iso'),
+        'DPI': image.info.get('dpi', 'N/A'),
+        'Bits per channel': image.info.get('bits', 'N/A'),
+        'Color space': image.info.get('icc_profile', 'N/A'),
+        'Orientation': image.info.get('exif', 'N/A'),
+        'Camera Make': image.info.get('make', 'N/A'),
+        'Camera Model': image.info.get('model', 'N/A'),
+        'Software': image.info.get('software', 'N/A'),
+        'Date Taken': image.info.get('datetime', 'N/A'),
+        'Exposure Time': image.info.get('exposuretime', 'N/A'),
+        'Focal Length': image.info.get('focallength', 'N/A'),
+        'Aperture': image.info.get('aperture', 'N/A'),
+        'ISO': image.info.get('iso', 'N/A'),
     }
     return metadata
 
@@ -69,17 +61,13 @@ def app_func():
     save_image_metadata(image_key, metadata)
 
     put_markdown("### Image Metadata:")
-    put_table(list(metadata.items()))
+    put_table([(key, value) for key, value in metadata.items()])
 
     # Display the uploaded image
     img_content = base64.b64encode(open(image_path, 'rb').read()).decode()
     put_image(img_content, width="50%", height="50%")
 
-    # Save the image key in the session for future retrieval
-    session['image_key'] = image_key
-
 app.add_url_rule('/', 'webio_view', webio_view(app_func), methods=['GET', 'POST'])
 
 if __name__ == '__main__':
-    #app.run(debug=True, host='0.0.0.0', port=80)
-    app.run(debug=False, port=80)
+    app.run(debug=True, host='0.0.0.0', port=8080)
