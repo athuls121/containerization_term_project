@@ -1,8 +1,7 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-redis-deployment
+  name: my-redis
 spec:
   replicas: 3
   selector:
@@ -14,13 +13,11 @@ spec:
         app: my-redis
     spec:
       containers:
-        - name: redis
-          image: athuls121/redis
-          ports:
-            - containerPort: 6379
-
+      - name: redis
+        image: redis:latest
+        ports:
+        - containerPort: 6379
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -29,7 +26,5 @@ spec:
   selector:
     app: my-redis
   ports:
-    - protocol: TCP
-      port: 6379
-      targetPort: 6379
-  type: LoadBalancer
+  - protocol: TCP
+    port: 6379
