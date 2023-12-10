@@ -12,8 +12,7 @@ import pickle
 app = Flask(__name__)
 
 ## Connect to Redis
-#redis_host = os.environ.get('REDIS_HOST')
-redis_host = 'redis'
+redis_host = 'redis' #service name for Docker_Swarm
 redis_port = 6379
 redis_db = 0
 redis_client = redis.StrictRedis(host=redis_host, port=redis_port, db=redis_db)
